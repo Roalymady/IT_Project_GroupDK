@@ -1,0 +1,74 @@
+{% extends "base.html" %} {% block title %}Sign In | UniGroupBuy{% endblock %}
+{% block content %}
+<section class="d-flex justify-content-center">
+    <div class="col-12 col-sm-10 col-md-8 col-lg-5">
+        <div class="card shadow-sm">
+            <div class="card-body p-4 p-md-5">
+                <h1 class="h4 mb-1 text-center">Welcome back</h1>
+                <p class="text-muted mb-4 text-center">
+                    Sign in to manage your group buys.
+                </p>
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="id_email" class="form-label"
+                            >Email address</label
+                        >
+                        <input
+                            type="email"
+                            class="form-control"
+                            id="id_email"
+                            name="email"
+                            required
+                            autocomplete="email"
+                            placeholder="you@example.com"
+                        />
+                    </div>
+                    <div class="mb-3">
+                        <div
+                            class="d-flex justify-content-between align-items-center"
+                        >
+                            <label for="id_password" class="form-label mb-0"
+                                >Password</label
+                            >
+                            <a href="#" class="small">Forgot password?</a>
+                        </div>
+                        <input
+                            type="password"
+                            class="form-control"
+                            id="id_password"
+                            name="password"
+                            required
+                            autocomplete="current-password"
+                        />
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input
+                            type="checkbox"
+                            class="form-check-input"
+                            id="id_remember"
+                            name="remember"
+                        />
+                        <label class="form-check-label" for="id_remember"
+                            >Remember me</label
+                        >
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button
+                            type="submit"
+                            class="btn btn-primary"
+                            aria-label="Sign in to UniGroupBuy"
+                        >
+                            Sign In
+                        </button>
+                    </div>
+                </form>
+                <p class="text-muted mt-4 mb-0 text-center">
+                    Do not have an account?
+                    <a href="{% url 'register' %}">Create one now</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

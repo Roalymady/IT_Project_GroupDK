@@ -1,0 +1,85 @@
+{% extends "base.html" %} {% block title %}Sign Up | UniGroupBuy{% endblock %}
+{% block content %}
+<section class="d-flex justify-content-center">
+    <div class="col-12 col-sm-10 col-md-8 col-lg-5">
+        <div class="card shadow-sm">
+            <div class="card-body p-4 p-md-5">
+                <h1 class="h4 mb-1 text-center">Create your account</h1>
+                <p class="text-muted mb-4 text-center">
+                    Join UniGroupBuy and start saving together.
+                </p>
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="id_full_name" class="form-label"
+                            >Full name</label
+                        >
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="id_full_name"
+                            name="full_name"
+                            required
+                            autocomplete="name"
+                            placeholder="Alex Johnson"
+                        />
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_email" class="form-label"
+                            >Email address</label
+                        >
+                        <input
+                            type="email"
+                            class="form-control"
+                            id="id_email"
+                            name="email"
+                            required
+                            autocomplete="email"
+                            placeholder="you@example.com"
+                        />
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_password" class="form-label"
+                            >Password</label
+                        >
+                        <input
+                            type="password"
+                            class="form-control"
+                            id="id_password"
+                            name="password1"
+                            required
+                            autocomplete="new-password"
+                        />
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_password_confirm" class="form-label"
+                            >Confirm password</label
+                        >
+                        <input
+                            type="password"
+                            class="form-control"
+                            id="id_password_confirm"
+                            name="password2"
+                            required
+                            autocomplete="new-password"
+                        />
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button
+                            type="submit"
+                            class="btn btn-primary"
+                            aria-label="Create UniGroupBuy account"
+                        >
+                            Sign Up
+                        </button>
+                    </div>
+                </form>
+                <p class="text-muted mt-4 mb-0 text-center">
+                    Already have an account?
+                    <a href="{% url 'login' %}">Sign in instead</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

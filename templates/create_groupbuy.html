@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Create Group Buy | UniGroupBuy{% endblock %}
+
+{% block content %}
+<section class="mb-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+        <div>
+            <h1 class="page-header-title mb-1">Create a new group buy</h1>
+            <p class="page-header-subtitle mb-0">
+                Set up the details so your classmates can join and save together.
+            </p>
+        </div>
+    </div>
+</section>
+
+<section aria-label="Create a new group buy form">
+    <div class="card">
+        <div class="card-body">
+            <form method="post" class="row g-3" novalidate>
+                {% csrf_token %}
+                <div class="col-12">
+                    <label for="id_title" class="form-label">Group buy title</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="id_title"
+                        name="title"
+                        required
+                        placeholder="Bubble Tea Happy Hour"
+                    >
+                </div>
+                <div class="col-12">
+                    <label for="id_store_name" class="form-label">Store name</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="id_store_name"
+                        name="store_name"
+                        required
+                        placeholder="Byres Road Tea House"
+                    >
+                </div>
+                <div class="col-12 col-md-6">
+                    <label for="id_category" class="form-label">Category</label>
+                    <select
+                        class="form-select"
+                        id="id_category"
+                        name="category"
+                        required
+                        aria-describedby="category-help"
+                    >
+                        <option value="" selected disabled>Select a category</option>
+                        <option value="Food">Food</option>
+                        <option value="Grocery">Grocery</option>
+                        <option value="Stationery">Stationery</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <div id="category-help" class="form-text">
+                        Use this to group similar deals together.
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label for="id_deadline" class="form-label">Deadline</label>
+                    <input
+                        type="datetime-local"
+                        class="form-control"
+                        id="id_deadline"
+                        name="deadline"
+                        required
+                        aria-describedby="deadline-help deadline-error"
+                    >
+                    <div id="deadline-help" class="form-text">
+                        Choose when this group buy will close for new orders.
+                    </div>
+                    <div
+                        id="deadline-error"
+                        class="invalid-feedback d-block"
+                        style="display: none;"
+                        aria-live="polite"
+                    ></div>
+                </div>
+                <div class="col-12">
+                    <label for="id_pickup_instructions" class="form-label">Pickup instructions</label>
+                    <textarea
+                        class="form-control"
+                        id="id_pickup_instructions"
+                        name="pickup_instructions"
+                        rows="3"
+                        required
+                        aria-describedby="pickup-help"
+                        placeholder="Example: Meet at the University of Glasgow library entrance at 6:30 PM."
+                    ></textarea>
+                    <div id="pickup-help" class="form-text">
+                        Explain where and when students should pick up their orders.
+                    </div>
+                </div>
+                <div class="col-12 d-flex justify-content-end pt-2">
+                    <button
+                        type="submit"
+                        class="btn btn-primary btn-press"
+                        aria-label="Create this group buy"
+                    >
+                        Create Group Buy
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

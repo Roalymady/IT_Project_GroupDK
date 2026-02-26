@@ -1,0 +1,178 @@
+{% extends "base.html" %} {% block title %}Dashboard | UniGroupBuy{% endblock %}
+{% block content %}
+<section class="mb-4">
+    <div
+        class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3"
+    >
+        <div>
+            <h1 class="page-header-title mb-1">Dashboard</h1>
+            <p class="page-header-subtitle mb-0">
+                Track ongoing group buys and discover new campus deals.
+            </p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <a
+                href="{% url 'create_groupbuy' %}"
+                class="btn btn-primary"
+                aria-label="Create a new group buy"
+            >
+                Create GroupBuy
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="mb-4">
+    <div
+        class="d-flex flex-wrap justify-content-between align-items-center gap-3"
+    >
+        <h2 class="h6 text-muted mb-0">Filter by category</h2>
+        <div
+            class="btn-group"
+            role="group"
+            aria-label="Filter group buys by category"
+        >
+            <button
+                type="button"
+                class="btn btn-outline-secondary js-category-filter active"
+                data-filter="all"
+                aria-pressed="true"
+            >
+                All
+            </button>
+            <button
+                type="button"
+                class="btn btn-outline-secondary js-category-filter"
+                data-filter="Food"
+                aria-pressed="false"
+            >
+                Food
+            </button>
+            <button
+                type="button"
+                class="btn btn-outline-secondary js-category-filter"
+                data-filter="Grocery"
+                aria-pressed="false"
+            >
+                Grocery
+            </button>
+        </div>
+    </div>
+</section>
+
+<section aria-label="Group buy list">
+    <div class="row g-4 js-groupbuy-list">
+        <div class="col-12 col-sm-6 col-lg-4" data-category="Food">
+            <article class="card groupbuy-card h-100">
+                <div class="card-body d-flex flex-column">
+                    <div
+                        class="d-flex justify-content-between align-items-start mb-2"
+                    >
+                        <span
+                            class="badge bg-light text-muted text-uppercase small"
+                        >
+                            Food
+                        </span>
+                        <span class="status-badge status-open"> Open </span>
+                    </div>
+                    <h2 class="h5 mb-1">Bubble Tea Happy Hour</h2>
+                    <p class="text-muted mb-3">Byres Road Tea House</p>
+                    <ul class="list-unstyled small mb-4 flex-grow-1">
+                        <li><strong>Deadline:</strong> Today 18:00</li>
+                        <li><strong>Participants:</strong> 12 students</li>
+                    </ul>
+                    <div
+                        class="d-flex justify-content-between align-items-center"
+                    >
+                        <span class="text-muted small">Min order: 10 cups</span>
+                        <a
+                            href="{% url 'groupbuy_detail' 1 %}"
+                            class="btn btn-sm btn-outline-primary"
+                            aria-label="View details for Bubble Tea Happy Hour group buy"
+                        >
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            </article>
+        </div>
+
+        <div class="col-12 col-sm-6 col-lg-4" data-category="Grocery">
+            <article class="card groupbuy-card h-100">
+                <div class="card-body d-flex flex-column">
+                    <div
+                        class="d-flex justify-content-between align-items-start mb-2"
+                    >
+                        <span
+                            class="badge bg-light text-muted text-uppercase small"
+                        >
+                            Grocery
+                        </span>
+                        <span class="status-badge status-ordered">
+                            Ordered
+                        </span>
+                    </div>
+                    <h2 class="h5 mb-1">Dorm Essentials Pack</h2>
+                    <p class="text-muted mb-3">Kelvinbridge Supermarket</p>
+                    <ul class="list-unstyled small mb-4 flex-grow-1">
+                        <li><strong>Deadline:</strong> Yesterday 21:00</li>
+                        <li><strong>Participants:</strong> 28 students</li>
+                    </ul>
+                    <div
+                        class="d-flex justify-content-between align-items-center"
+                    >
+                        <span class="text-muted small"
+                            >Status: Delivery in progress</span
+                        >
+                        <a
+                            href="{% url 'groupbuy_detail' 2 %}"
+                            class="btn btn-sm btn-outline-secondary"
+                            aria-label="View details for Dorm Essentials Pack group buy"
+                        >
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            </article>
+        </div>
+
+        <div class="col-12 col-sm-6 col-lg-4" data-category="Food">
+            <article class="card groupbuy-card h-100">
+                <div class="card-body d-flex flex-column">
+                    <div
+                        class="d-flex justify-content-between align-items-start mb-2"
+                    >
+                        <span
+                            class="badge bg-light text-muted text-uppercase small"
+                        >
+                            Food
+                        </span>
+                        <span class="status-badge status-closed"> Closed </span>
+                    </div>
+                    <h2 class="h5 mb-1">Late Night Pizza Combo</h2>
+                    <p class="text-muted mb-3">West End Pizza</p>
+                    <ul class="list-unstyled small mb-4 flex-grow-1">
+                        <li><strong>Deadline:</strong> Tomorrow 22:00</li>
+                        <li><strong>Participants:</strong> 19 students</li>
+                    </ul>
+                    <div
+                        class="d-flex justify-content-between align-items-center"
+                    >
+                        <span class="text-muted small"
+                            >Next batch opens soon</span
+                        >
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-outline-secondary"
+                            disabled
+                            aria-label="This group buy will open again soon"
+                        >
+                            Coming Soon
+                        </button>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </div>
+</section>
+{% endblock %}
