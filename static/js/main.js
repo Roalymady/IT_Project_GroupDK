@@ -275,29 +275,45 @@ function initCreateGroupBuyForm() {
         });
     }
 }
-<<<<<<< HEAD
+function joinGroupBuy(id, quantity) {
+    var normalizedQuantity = quantity || 1;
+    var csrfToken = getCsrfToken();
 
-function joinGroupBuy(id){
-
-    fetch("/groupbuy/" + id + "/join/", {
-
-        method:"POST",
-
-        headers:{
-            "X-CSRFToken":csrftoken,
-            "Content-Type":"application/x-www-form-urlencoded"
+    return fetch("/groupbuy/" + id + "/join/", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": csrfToken,
+            "Content-Type": "application/x-www-form-urlencoded"
         },
+        body: "quantity=" + encodeURIComponent(normalizedQuantity)
+    }).then(function (response) {
+        if (!response.ok) {
+            throw new Error("Join request failed");
+        }
 
-        body:"quantity=1"
-
-    }).then(()=>{
-
-        alert("Joined!")
-
-        location.reload()
-
-    })
-
+        alert("Joined!");
+        window.location.reload();
+    }).catch(function () {
+        alert("Could not join this group buy right now.");
+    });
 }
-=======
->>>>>>> 0c709a6eb1e17b35cea830a2cac1dba8e067e2ca
+
+function getCsrfToken() {
+    var cookieString = document.cookie || "";
+    var cookiePairs = cookieString.split(";");
+
+    for (var index = 0; index < cookiePairs.length; index += 1) {
+        var rawCookie = cookiePairs[index].trim();
+        if (!rawCookie) {
+            continue;
+        }
+
+        if (rawCookie.indexOf("csrftoken=") === 0) {
+            return decodeURIComponent(rawCookie.substring("csrftoken=".length));
+        }
+    }
+
+    return "";
+}
+
+window.joinGroupBuy = joinGroupBuy;
