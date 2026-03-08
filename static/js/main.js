@@ -275,3 +275,29 @@ function initCreateGroupBuyForm() {
         });
     }
 }
+<<<<<<< HEAD
+
+function joinGroupBuy(id){
+
+    fetch("/groupbuy/" + id + "/join/", {
+
+        method:"POST",
+
+        headers:{
+            "X-CSRFToken":csrftoken,
+            "Content-Type":"application/x-www-form-urlencoded"
+        },
+
+        body:"quantity=1"
+
+    }).then(()=>{
+
+        alert("Joined!")
+
+        location.reload()
+
+    })
+
+}
+=======
+>>>>>>> 0c709a6eb1e17b35cea830a2cac1dba8e067e2ca
