@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 from django.contrib import admin
 from django.urls import path
 from . import views
@@ -25,7 +25,7 @@ urlpatterns = [
 
     path('profile/', views.profile_view, name="profile"),
 ]
-=======
+
 """
 URL configuration for mysite project.
 
@@ -68,4 +68,3 @@ urlpatterns = [
     path("logout/", logout_view, name="logout"),
     path("admin/", admin.site.urls),
 ]
->>>>>>> 0c709a6eb1e17b35cea830a2cac1dba8e067e2ca
