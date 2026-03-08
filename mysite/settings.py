@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+<<<<<<< HEAD
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,6 +41,14 @@ INSTALLED_APPS = [
 
     'groupbuy',
 
+=======
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+>>>>>>> 0c709a6eb1e17b35cea830a2cac1dba8e067e2ca
 ]
 
 MIDDLEWARE = [
@@ -120,5 +129,8 @@ USE_TZ = True
 STATIC_URL = "static/"
 
 STATICFILES_DIRS = [BASE_DIR / "static"]
+<<<<<<< HEAD
 
 LOGIN_URL = '/login/'
+=======
+>>>>>>> 0c709a6eb1e17b35cea830a2cac1dba8e067e2ca

@@ -275,6 +275,7 @@ function initCreateGroupBuyForm() {
         });
     }
 }
+<<<<<<< HEAD
 
 function joinGroupBuy(id){
 
@@ -298,3 +299,5 @@ function joinGroupBuy(id){
     })
 
 }
+=======
+>>>>>>> 0c709a6eb1e17b35cea830a2cac1dba8e067e2ca
