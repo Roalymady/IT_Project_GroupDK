@@ -36,28 +36,15 @@ def create_groupbuy(request):
 
         return redirect("dashboard")
 
-
-from django.shortcuts import render, redirect
-
-
-def dashboard(request):
-    return render(request, "dashboard.html")
-
-
-def create_groupbuy(request):
-    if request.method == "POST":
-        return redirect("groupbuy_detail", groupbuy_id=1)
-
     return render(request, "create_groupbuy.html")
-
 
 def login_view(request):
 
 
     if request.method == "POST":
 
-        username = request.POST["username"]
-        password = request.POST["password"]
+        username = request.POST.get("username")
+        password = request.POST.get("password")
 
         user = authenticate(
             request,
@@ -71,22 +58,17 @@ def login_view(request):
 
             return redirect("dashboard")
 
-
-    if request.method == "POST":
-        return redirect("dashboard")
-
     return render(request, "login.html")
-
-
+    
 def register_view(request):
 
-
     if request.method == "POST":
 
-        username = request.POST["username"]
-        password = request.POST["password"]
+        username = request.POST.get("username")
+        password = request.POST.get("password")
 
-        User.objects.create_user(
+        if not User.objects.filter(username = username).exists():
+            User.objects.create_user(
             username=username,
             password=password
         )
@@ -111,18 +93,18 @@ def groupbuy_detail(request, groupbuy_id):
 
 @login_required
 def join_groupbuy(request, groupbuy_id):
+    if request.method == "POST":
+        groupbuy = get_object_or_404(GroupBuy, id=groupbuy_id)
 
-    groupbuy = get_object_or_404(GroupBuy, id=groupbuy_id)
+        quantity = request.POST["quantity"]
 
-    quantity = request.POST["quantity"]
+        Order.objects.create(
+            user=request.user,
+            groupbuy=groupbuy,
+            quantity=quantity
+        )
 
-    Order.objects.create(
-        user=request.user,
-        groupbuy=groupbuy,
-        quantity=quantity
-    )
-
-    return redirect("groupbuy_detail", groupbuy_id=groupbuy.id)
+    return redirect("groupbuy_detail", groupbuy_id=groupbuy_id)
 
 
 @login_required
@@ -146,24 +128,4 @@ def logout_view(request):
     logout(request)
 
     return redirect("login")
-
-    if request.method == "POST":
-        return redirect("dashboard")
-    return render(request, "register.html")
-
-
-def groupbuy_detail(request, groupbuy_id):
-    return render(request, "detail.html", {"groupbuy_id": groupbuy_id})
-
-
-def my_orders(request):
-    return render(request, "my_orders.html")
-
-
-def logout_view(request):
-    return redirect("login")
-
-
-def profile_view(request):
-    return render(request, "profile.html")
 
