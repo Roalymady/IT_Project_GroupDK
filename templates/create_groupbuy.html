@@ -19,6 +19,7 @@
         <div class="card-body">
             <form method="post" class="row g-3" novalidate>
                 {% csrf_token %}
+                
                 <div class="col-12">
                     <label for="id_title" class="form-label">Group buy title</label>
                     <input
@@ -30,76 +31,52 @@
                         placeholder="Bubble Tea Happy Hour"
                     >
                 </div>
-                <div class="col-12">
-                    <label for="id_store_name" class="form-label">Store name</label>
+
+                <div class="col-12 col-md-6">
+                    <label for="id_price" class="form-label">Price (£)</label>
                     <input
-                        type="text"
+                        type="number"
+                        step="0.01"
                         class="form-control"
-                        id="id_store_name"
-                        name="store_name"
+                        id="id_price"
+                        name="price"
                         required
-                        placeholder="Byres Road Tea House"
+                        placeholder="e.g. 5.50"
                     >
                 </div>
+
                 <div class="col-12 col-md-6">
-                    <label for="id_category" class="form-label">Category</label>
-                    <select
-                        class="form-select"
-                        id="id_category"
-                        name="category"
+                    <label for="id_target_quantity" class="form-label">Target Quantity</label>
+                    <input
+                        type="number"
+                        class="form-control"
+                        id="id_target_quantity"
+                        name="target_quantity"
                         required
-                        aria-describedby="category-help"
+                        placeholder="e.g. 10"
                     >
-                        <option value="" selected disabled>Select a category</option>
-                        <option value="Food">Food</option>
-                        <option value="Grocery">Grocery</option>
-                        <option value="Stationery">Stationery</option>
-                        <option value="Other">Other</option>
-                    </select>
-                    <div id="category-help" class="form-text">
-                        Use this to group similar deals together.
+                    <div class="form-text">
+                        How many orders needed to get the discount?
                     </div>
                 </div>
-                <div class="col-12 col-md-6">
-                    <label for="id_deadline" class="form-label">Deadline</label>
-                    <input
-                        type="datetime-local"
-                        class="form-control"
-                        id="id_deadline"
-                        name="deadline"
-                        required
-                        aria-describedby="deadline-help deadline-error"
-                    >
-                    <div id="deadline-help" class="form-text">
-                        Choose when this group buy will close for new orders.
-                    </div>
-                    <div
-                        id="deadline-error"
-                        class="invalid-feedback d-block"
-                        style="display: none;"
-                        aria-live="polite"
-                    ></div>
-                </div>
+
                 <div class="col-12">
-                    <label for="id_pickup_instructions" class="form-label">Pickup instructions</label>
+                    <label for="id_description" class="form-label">Description & Pickup instructions</label>
                     <textarea
                         class="form-control"
-                        id="id_pickup_instructions"
-                        name="pickup_instructions"
+                        id="id_description"
+                        name="description"
                         rows="3"
                         required
-                        aria-describedby="pickup-help"
-                        placeholder="Example: Meet at the University of Glasgow library entrance at 6:30 PM."
+                        placeholder="Example: From Byres Road Tea House. Meet at the University of Glasgow library entrance at 6:30 PM."
                     ></textarea>
-                    <div id="pickup-help" class="form-text">
-                        Explain where and when students should pick up their orders.
-                    </div>
                 </div>
+
                 <div class="col-12 d-flex justify-content-end pt-2">
                     <button
                         type="submit"
                         class="btn btn-primary btn-press"
-                        aria-label="Create this group buy"
+                        aria-label="Create Group Buy"
                     >
                         Create Group Buy
                     </button>

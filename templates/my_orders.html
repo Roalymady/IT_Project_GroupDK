@@ -1,37 +1,19 @@
 {% extends "base.html" %} {% block title %}My Orders | UniGroupBuy{% endblock %}
 {% block content %}
 <section class="mb-4">
-    <div
-        class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3"
-    >
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
         <div>
             <h1 class="page-header-title mb-1">My orders</h1>
-            <p class="page-header-subtitle mb-0">
-                Review the group buys you have joined and their latest status.
-            </p>
+            <p class="page-header-subtitle mb-0">Review the group buys you have joined.</p>
         </div>
     </div>
 </section>
 
 <section aria-label="My orders list">
     <div class="card mb-3">
-        <div
-            class="card-body d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3"
-        >
+        <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
             <div>
-                <p class="mb-1">Signed in as <strong>Alex Johnson</strong></p>
-                <p class="mb-0 text-muted">
-                    You have joined <strong>3</strong> active group buys and
-                    completed <strong>5</strong> orders.
-                </p>
-            </div>
-            <div class="d-flex flex-wrap gap-2">
-                <span class="badge bg-light text-muted text-uppercase small">
-                    Joined this week: 1
-                </span>
-                <span class="badge bg-light text-muted text-uppercase small">
-                    Completed this month: 2
-                </span>
+                <p class="mb-1">Signed in as <strong>{{ request.user.username }}</strong></p>
             </div>
         </div>
     </div>
@@ -43,95 +25,32 @@
                     <thead class="table-light">
                         <tr>
                             <th scope="col">Group buy</th>
-                            <th scope="col">Status</th>
-                            <th scope="col">Role</th>
-                            <th scope="col">Items</th>
-                            <th scope="col">Total</th>
+                            <th scope="col">Quantity</th>
+                            <th scope="col">Total Price</th>
                             <th scope="col">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
+                        {% for order in orders %}
                         <tr>
                             <td>
-                                <div class="fw-semibold">
-                                    Bubble Tea Happy Hour
-                                </div>
-                                <div class="small text-muted">
-                                    Byres Road Tea House
-                                </div>
+                                <div class="fw-semibold">{{ order.groupbuy.title }}</div>
+                                <div class="small text-muted">ID: #{{ order.groupbuy.id }}</div>
                             </td>
+                            <td>{{ order.quantity }} items</td>
+                            <td>£{% widthratio order.quantity 1 order.groupbuy.price %}</td>
                             <td>
-                                <span class="status-badge status-open"
-                                    >Open</span
-                                >
-                            </td>
-                            <td>Participant</td>
-                            <td>3 items</td>
-                            <td>£12.00</td>
-                            <td>
-                                <a
-                                    href="{% url 'groupbuy_detail' 1 %}"
-                                    class="btn btn-sm btn-outline-primary"
-                                    aria-label="View this group buy details"
-                                >
-                                    View group buy
-                                </a>
+                                <a href="{% url 'groupbuy_detail' order.groupbuy.id %}" class="btn btn-sm btn-outline-primary">View details</a>
                             </td>
                         </tr>
+                        {% empty %}
                         <tr>
-                            <td>
-                                <div class="fw-semibold">
-                                    Dorm Essentials Pack
-                                </div>
-                                <div class="small text-muted">
-                                    Kelvinbridge Supermarket
-                                </div>
-                            </td>
-                            <td>
-                                <span class="status-badge status-ordered"
-                                    >Ordered</span
-                                >
-                            </td>
-                            <td>Participant</td>
-                            <td>5 items</td>
-                            <td>£45.20</td>
-                            <td>
-                                <a
-                                    href="{% url 'groupbuy_detail' 2 %}"
-                                    class="btn btn-sm btn-outline-secondary"
-                                    aria-label="View this group buy details"
-                                >
-                                    View group buy
-                                </a>
+                            <td colspan="4" class="text-center py-5 text-muted">
+                                <h5>You haven't joined any group buys yet.</h5>
+                                <a href="{% url 'dashboard' %}" class="btn btn-primary mt-2">Go to Dashboard</a>
                             </td>
                         </tr>
-                        <tr>
-                            <td>
-                                <div class="fw-semibold">
-                                    Stationery Starter Kit
-                                </div>
-                                <div class="small text-muted">
-                                    University of Glasgow Bookshop
-                                </div>
-                            </td>
-                            <td>
-                                <span class="status-badge status-closed"
-                                    >Closed</span
-                                >
-                            </td>
-                            <td>Organizer</td>
-                            <td>8 items</td>
-                            <td>£72.40</td>
-                            <td>
-                                <a
-                                    href="{% url 'groupbuy_detail' 3 %}"
-                                    class="btn btn-sm btn-outline-secondary"
-                                    aria-label="View this group buy details"
-                                >
-                                    View group buy
-                                </a>
-                            </td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
