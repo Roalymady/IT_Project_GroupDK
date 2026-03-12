@@ -275,10 +275,18 @@ function initCreateGroupBuyForm() {
         });
     }
 }
+<<<<<<< HEAD
 function joinGroupBuy(id, quantity) {
     var normalizedQuantity = quantity || 1;
     var csrfToken = getCsrfToken();
 
+=======
+
+function joinGroupBuy(id, quantity) {
+    var normalizedQuantity = quantity || 1;
+    var csrfToken = getCsrfToken();
+
+>>>>>>> 78138d515319c880d41da4a0f85c4ed5f3108918
     return fetch("/groupbuy/" + id + "/join/", {
         method: "POST",
         headers: {
@@ -316,4 +324,3 @@ function getCsrfToken() {
     return "";
 }
 
-window.joinGroupBuy = joinGroupBuy;
