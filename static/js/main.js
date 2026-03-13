@@ -1,10 +1,41 @@
+// Initialize optional enhancements once the DOM is ready.
 document.addEventListener("DOMContentLoaded", function () {
+    initFooterSpacing();
     initAutoDismissAlerts();
     initCategoryFilters();
     initAddItemForm();
+    initDeleteItemForms();
     initDeadlineCountdown();
     initCreateGroupBuyForm();
 });
+
+// Reserve enough scroll space so the fixed footer never overlaps page content.
+function initFooterSpacing() {
+    var footer = document.querySelector(".app-footer");
+    if (!footer) {
+        return;
+    }
+
+    var root = document.documentElement;
+
+    function updateFooterSpacing() {
+        var footerHeight = footer.offsetHeight;
+        if (!footerHeight || footerHeight < 1) {
+            return;
+        }
+
+        root.style.setProperty("--app-footer-height", footerHeight + "px");
+    }
+
+    updateFooterSpacing();
+    window.requestAnimationFrame(updateFooterSpacing);
+
+    var resizeTimer = null;
+    window.addEventListener("resize", function () {
+        window.clearTimeout(resizeTimer);
+        resizeTimer = window.setTimeout(updateFooterSpacing, 150);
+    });
+}
 
 // Automatically dismiss Django messages after a short delay
 function initAutoDismissAlerts() {
@@ -37,7 +68,7 @@ function initAutoDismissAlerts() {
     });
 }
 
-// Filter group buy cards on the dashboard without reloading the page
+// Filter dashboard cards client-side by their data-category attribute.
 function initCategoryFilters() {
     var filterButtons = document.querySelectorAll(".js-category-filter");
     var groupbuyColumns = document.querySelectorAll(".js-groupbuy-list [data-category]");
@@ -59,9 +90,8 @@ function initCategoryFilters() {
             button.setAttribute("aria-pressed", "true");
 
             groupbuyColumns.forEach(function (column) {
-                var category = column.getAttribute("data-category");
+                var category = column.getAttribute("data-category") || "";
                 var shouldShow = selectedFilter === "all" || category === selectedFilter;
-
                 column.style.display = shouldShow ? "" : "none";
             });
         });
@@ -87,7 +117,7 @@ function initAddItemForm() {
         var priceInput = document.getElementById("id_price");
         var addedByInput = document.getElementById("id_added_by");
 
-        if (!itemNameInput || !quantityInput || !priceInput || !addedByInput) {
+        if (!itemNameInput || !quantityInput || !priceInput) {
             return;
         }
 
@@ -99,7 +129,7 @@ function initAddItemForm() {
         var itemName = itemNameInput.value.trim();
         var quantity = quantityInput.value.trim();
         var price = priceInput.value.trim();
-        var addedBy = addedByInput.value.trim();
+        var addedBy = addedByInput ? addedByInput.value.trim() : "";
 
         if (!itemName || !quantity || !price || !addedBy) {
             return;
@@ -133,21 +163,104 @@ function initAddItemForm() {
                 item_name: itemName,
                 quantity: quantity,
                 price: price,
-                added_by: addedBy
             };
 
             fetch(actionUrl, {
                 method: form.getAttribute("method") || "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "X-Requested-With": "XMLHttpRequest"
+                    "X-Requested-With": "XMLHttpRequest",
+                    "X-CSRFToken": getCsrfToken()
                 },
                 body: JSON.stringify(payload),
                 keepalive: true
+            }).then(function (response) {
+                if (!response.ok) {
+                    throw new Error("Request failed");
+                }
+                return response.json();
+            }).then(function (data) {
+                if (!data || !data.delete_url) {
+                    return;
+                }
+
+                var actionsCell = document.createElement("td");
+                actionsCell.className = "text-end";
+
+                var formElement = document.createElement("form");
+                formElement.className = "d-inline js-delete-item-form";
+                formElement.setAttribute("method", "post");
+                formElement.setAttribute("action", data.delete_url);
+
+                var button = document.createElement("button");
+                button.type = "submit";
+                button.className = "btn btn-sm btn-outline-danger";
+                button.textContent = "Remove";
+
+                formElement.appendChild(button);
+                actionsCell.appendChild(formElement);
+                row.appendChild(actionsCell);
+
+                bindDeleteItemForm(formElement);
             }).catch(function () {
-                // Network errors are ignored in this demo interaction.
+                row.remove();
+                alert("Could not add this item right now.");
             });
         }
+    });
+}
+
+// Delete item rows via AJAX when possible, falling back to normal form submission.
+function initDeleteItemForms() {
+    var forms = document.querySelectorAll(".js-delete-item-form");
+    if (!forms.length) {
+        return;
+    }
+
+    forms.forEach(function (form) {
+        bindDeleteItemForm(form);
+    });
+}
+
+function bindDeleteItemForm(form) {
+    if (!form || form.dataset.bound === "1") {
+        return;
+    }
+    form.dataset.bound = "1";
+
+    form.addEventListener("submit", function (event) {
+        if (!window.fetch) {
+            return;
+        }
+
+        event.preventDefault();
+
+        var actionUrl = form.getAttribute("action") || "";
+        if (!actionUrl) {
+            return;
+        }
+
+        fetch(actionUrl, {
+            method: "POST",
+            headers: {
+                "X-Requested-With": "XMLHttpRequest",
+                "X-CSRFToken": getCsrfToken()
+            },
+            keepalive: true
+        }).then(function (response) {
+            if (!response.ok) {
+                throw new Error("Delete failed");
+            }
+        }).then(function () {
+            var row = form.closest("tr");
+            if (row) {
+                row.remove();
+            } else {
+                window.location.reload();
+            }
+        }).catch(function () {
+            window.location.reload();
+        });
     });
 }
 
@@ -199,6 +312,7 @@ function initDeadlineCountdown() {
     var intervalId = window.setInterval(updateCountdown, 60000);
 }
 
+// Escape user-provided strings before injecting them into HTML.
 function escapeHtml(value) {
     return String(value)
         .replace(/&/g, "&amp;")
@@ -208,7 +322,7 @@ function escapeHtml(value) {
         .replace(/'/g, "&#039;");
 }
 
-// Validate that the chosen deadline on the create group buy page is in the future
+// Validate create-groupbuy deadline client-side to prevent past dates.
 function initCreateGroupBuyForm() {
     var deadlineInput = document.getElementById("id_deadline");
     var errorElement = document.getElementById("deadline-error");
@@ -234,13 +348,13 @@ function initCreateGroupBuyForm() {
 
     function showDeadlineError(message) {
         errorElement.textContent = message;
-        errorElement.style.display = "";
+        errorElement.classList.remove("d-none");
         deadlineInput.classList.add("is-invalid");
     }
 
     function clearDeadlineError() {
         errorElement.textContent = "";
-        errorElement.style.display = "none";
+        errorElement.classList.add("d-none");
         deadlineInput.classList.remove("is-invalid");
     }
 
@@ -252,7 +366,6 @@ function initCreateGroupBuyForm() {
         }
 
         var now = new Date();
-
         if (selectedDeadline.getTime() <= now.getTime()) {
             showDeadlineError("Please choose a deadline in the future.");
             return false;
@@ -276,10 +389,10 @@ function initCreateGroupBuyForm() {
     }
 }
 
+// Join a group buy via POST and reload the page on success.
 function joinGroupBuy(id, quantity) {
     var normalizedQuantity = quantity || 1;
     var csrfToken = getCsrfToken();
-
     return fetch("/groupbuy/" + id + "/join/", {
         method: "POST",
         headers: {
@@ -299,6 +412,7 @@ function joinGroupBuy(id, quantity) {
     });
 }
 
+// Read Django's CSRF token from cookies for fetch requests.
 function getCsrfToken() {
     var cookieString = document.cookie || "";
     var cookiePairs = cookieString.split(";");
@@ -318,3 +432,4 @@ function getCsrfToken() {
 }
 
 window.joinGroupBuy = joinGroupBuy;
+

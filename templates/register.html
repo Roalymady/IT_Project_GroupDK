@@ -1,6 +1,9 @@
-{% extends "base.html" %} {% block title %}Sign Up | UniGroupBuy{% endblock %}
+{% extends "base.html" %}
+{# Auth page: create a new account to access group buy features. #}
+{% block title %}Sign Up | UniGroupBuy{% endblock %}
 {% block content %}
 <section class="d-flex justify-content-center">
+    {# Responsive centered registration card. #}
     <div class="col-12 col-sm-10 col-md-8 col-lg-5">
         <div class="card shadow-sm">
             <div class="card-body p-4 p-md-5">
@@ -8,10 +11,12 @@
                 <p class="text-muted mb-4 text-center">
                     Join UniGroupBuy and start saving together.
                 </p>
+                {# POST signup form protected by CSRF. #}
                 <form method="post" novalidate>
                     {% csrf_token %}
                     
                     <div class="mb-3">
+                        {# Username becomes the account identifier used for login. #}
                         <label for="id_username" class="form-label"
                             >Username</label
                         >
@@ -27,6 +32,7 @@
                     </div>
                     
                     <div class="mb-3">
+                        {# Password is stored securely by Django's auth system. #}
                         <label for="id_password" class="form-label"
                             >Password</label
                         >
@@ -41,6 +47,7 @@
                     </div>
                     
                     <div class="d-grid gap-2">
+                        {# Submit creates the account and redirects to login. #}
                         <button
                             type="submit"
                             class="btn btn-primary"
@@ -51,6 +58,7 @@
                     </div>
                 </form>
                 <p class="text-muted mt-4 mb-0 text-center">
+                    {# Link back to login for existing users. #}
                     Already have an account?
                     <a href="{% url 'login' %}">Sign in instead</a>
                 </p>
