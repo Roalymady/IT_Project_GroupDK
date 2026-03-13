@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 
+{# Organizer flow: create a new group buy with required metadata and validation. #}
 {% block title %}Create Group Buy | UniGroupBuy{% endblock %}
 
 {% block content %}
@@ -17,10 +18,12 @@
 <section aria-label="Create a new group buy form">
     <div class="card">
         <div class="card-body">
+            {# Server-rendered form; values are repopulated via form_data after validation errors. #}
             <form method="post" class="row g-3" novalidate>
                 {% csrf_token %}
                 
                 <div class="col-12">
+                    {# Basic title shown on dashboard/detail pages. #}
                     <label for="id_title" class="form-label">Group buy title</label>
                     <input
                         type="text"
@@ -29,10 +32,57 @@
                         name="title"
                         required
                         placeholder="Bubble Tea Happy Hour"
+                        value="{{ form_data.title|default:'' }}"
                     >
                 </div>
 
                 <div class="col-12 col-md-6">
+                    {# Store name displayed to participants for context. #}
+                    <label for="id_store_name" class="form-label">Store name</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="id_store_name"
+                        name="store_name"
+                        required
+                        placeholder="Byres Road Tea House"
+                        value="{{ form_data.store_name|default:'' }}"
+                    >
+                </div>
+
+                <div class="col-12 col-md-6">
+                    {# Category used for filtering on dashboard and My Orders. #}
+                    <label for="id_category" class="form-label">Category</label>
+                    <select class="form-select" id="id_category" name="category" required>
+                        <option value="" {% if not form_data.category %}selected{% endif %} disabled>Select a category</option>
+                        <option value="Food" {% if form_data.category == "Food" %}selected{% endif %}>Food</option>
+                        <option value="Grocery" {% if form_data.category == "Grocery" %}selected{% endif %}>Grocery</option>
+                        <option value="Stationery" {% if form_data.category == "Stationery" %}selected{% endif %}>Stationery</option>
+                        <option value="Other" {% if form_data.category == "Other" %}selected{% endif %}>Other</option>
+                    </select>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    {# Deadline validated client-side and stored as a timezone-aware datetime. #}
+                    <label for="id_deadline" class="form-label">Deadline</label>
+                    <input
+                        type="datetime-local"
+                        class="form-control"
+                        id="id_deadline"
+                        name="deadline"
+                        required
+                        value="{{ form_data.deadline|default:'' }}"
+                        aria-describedby="deadline-help deadline-error"
+                    >
+                    <div id="deadline-help" class="form-text">
+                        Choose a future date and time.
+                    </div>
+                    {# Error text is toggled by main.js deadline validation. #}
+                    <div id="deadline-error" class="invalid-feedback d-block d-none"></div>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    {# Unit price used to compute totals and order summaries. #}
                     <label for="id_price" class="form-label">Price (£)</label>
                     <input
                         type="number"
@@ -42,10 +92,12 @@
                         name="price"
                         required
                         placeholder="e.g. 5.50"
+                        value="{{ form_data.price|default:'' }}"
                     >
                 </div>
 
                 <div class="col-12 col-md-6">
+                    {# Target quantity for reaching the group deal. #}
                     <label for="id_target_quantity" class="form-label">Target Quantity</label>
                     <input
                         type="number"
@@ -54,6 +106,7 @@
                         name="target_quantity"
                         required
                         placeholder="e.g. 10"
+                        value="{{ form_data.target_quantity|default:'' }}"
                     >
                     <div class="form-text">
                         How many orders needed to get the discount?
@@ -61,18 +114,32 @@
                 </div>
 
                 <div class="col-12">
-                    <label for="id_description" class="form-label">Description & Pickup instructions</label>
+                    {# Pickup instructions shown on the detail page. #}
+                    <label for="id_pickup_instructions" class="form-label">Pickup instructions</label>
+                    <textarea
+                        class="form-control"
+                        id="id_pickup_instructions"
+                        name="pickup_instructions"
+                        rows="3"
+                        required
+                        placeholder="Example: Meet at the University of Glasgow library entrance at 6:30 PM."
+                    >{{ form_data.pickup_instructions|default:'' }}</textarea>
+                </div>
+
+                <div class="col-12">
+                    {# Optional additional context for participants. #}
+                    <label for="id_description" class="form-label">Description (optional)</label>
                     <textarea
                         class="form-control"
                         id="id_description"
                         name="description"
                         rows="3"
-                        required
-                        placeholder="Example: From Byres Road Tea House. Meet at the University of Glasgow library entrance at 6:30 PM."
-                    ></textarea>
+                        placeholder="Add any extra details for participants."
+                    >{{ form_data.description|default:'' }}</textarea>
                 </div>
 
                 <div class="col-12 d-flex justify-content-end pt-2">
+                    {# Submit creates the GroupBuy and redirects back to the dashboard. #}
                     <button
                         type="submit"
                         class="btn btn-primary btn-press"

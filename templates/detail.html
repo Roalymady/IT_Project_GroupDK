@@ -1,18 +1,127 @@
 {% extends "base.html" %} 
+{# Core page: show group buy details, items, participant orders, and actions. #}
 {% block title %}Group Buy Detail | UniGroupBuy{% endblock %} 
 
 {% block content %}
 <section class="mb-4">
     <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start gap-3">
         <div>
+            {# Basic group buy information visible to all participants. #}
             <h1 class="page-header-title mb-1">{{ groupbuy.title }}</h1>
-            <p class="page-header-subtitle mb-2">{{ groupbuy.description }}</p>
+            <p class="page-header-subtitle mb-2">{{ groupbuy.store_name }}</p>
+            {% if groupbuy.description %}
+            <p class="text-muted mb-2">{{ groupbuy.description }}</p>
+            {% endif %}
+            <p class="mb-1"><strong>Category:</strong> {{ groupbuy.category|default:"Other" }}</p>
             <p class="mb-1"><strong>Price:</strong> £{{ groupbuy.price }}</p>
             <p class="mb-1"><strong>Organizer:</strong> {{ groupbuy.created_by.username }}</p>
+            <p class="mb-0"><strong>Pickup:</strong> {{ groupbuy.pickup_instructions|default:"—" }}</p>
         </div>
         <div class="d-flex flex-column align-items-start align-items-lg-end gap-2">
-            <span class="status-badge status-open">Open</span>
+            {# Status badge uses CSS classes to visually differentiate state. #}
+            <span class="status-badge status-{{ groupbuy.status|default:'open' }}">
+                {{ groupbuy.get_status_display|default:"Open" }}
+            </span>
+            {% if groupbuy.deadline %}
+            {# Deadline and countdown are shown when a deadline exists. #}
+            <p class="small text-muted mb-0">Deadline: {{ groupbuy.deadline|date:"Y-m-d H:i" }}</p>
+            <p id="groupbuy-countdown" class="small text-muted mb-0" data-deadline="{{ groupbuy.deadline|date:'c' }}"></p>
+            {% endif %}
             <p class="small text-muted mb-0">Target Quantity: {{ groupbuy.target_quantity }}</p>
+            {% if groupbuy.created_by == request.user %}
+            {# Organizer-only control for updating the group buy status. #}
+            <form method="post" action="{% url 'update_groupbuy_status' groupbuy.id %}" class="d-flex align-items-center gap-2">
+                {% csrf_token %}
+                <label for="id_status" class="visually-hidden">Update status</label>
+                <select id="id_status" name="status" class="form-select form-select-sm" aria-label="Update group buy status">
+                    <option value="open" {% if groupbuy.status == "open" %}selected{% endif %}>Open</option>
+                    <option value="ordered" {% if groupbuy.status == "ordered" %}selected{% endif %}>Ordered</option>
+                    <option value="closed" {% if groupbuy.status == "closed" %}selected{% endif %}>Closed</option>
+                </select>
+                <button type="submit" class="btn btn-sm btn-outline-primary">Update</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<section class="mb-4" aria-label="Items in this group buy">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>Items</span>
+            <span class="text-muted small">Participants can add what they want to buy</span>
+        </div>
+        <div class="card-body p-0">
+            {# Items list; JS can append new rows after successful AJAX submission. #}
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">Item</th>
+                            <th scope="col">Quantity</th>
+                            <th scope="col">Added by</th>
+                            <th scope="col">Price</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="js-items-tbody">
+                        {% for item in items %}
+                        <tr>
+                            <td>{{ item.item_name }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>{{ item.added_by.username }}</td>
+                            <td>£{{ item.price }}</td>
+                            <td class="text-end">
+                                {% if item.added_by == request.user or groupbuy.created_by == request.user %}
+                                <form method="post" action="{% url 'delete_groupbuy_item' groupbuy.id item.id %}" class="d-inline js-delete-item-form">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                                </form>
+                                {% else %}
+                                <span class="text-muted">—</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-3">No items yet. Add one to get started.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-body border-top">
+            {# Live region announces new items for screen readers. #}
+            <div id="item-updates-live-region" class="visually-hidden" aria-live="polite"></div>
+            {# Add item form is handled via AJAX by main.js to avoid a full page reload. #}
+            {% if groupbuy.status != "open" %}
+            <div class="alert alert-warning mb-3" role="alert">
+                This group buy is not open for adding items right now.
+            </div>
+            {% endif %}
+            <form class="row g-3 js-add-item-form" method="post" action="{% url 'add_groupbuy_item' groupbuy.id %}" novalidate>
+                {% csrf_token %}
+                <div class="col-12 col-md-5">
+                    <label for="id_item_name" class="form-label">Item name</label>
+                    <input type="text" class="form-control" id="id_item_name" name="item_name" required placeholder="e.g. Large milk tea" {% if groupbuy.status != "open" %}disabled{% endif %} />
+                </div>
+                <div class="col-6 col-md-2">
+                    <label for="id_quantity" class="form-label">Quantity</label>
+                    <input type="number" class="form-control" id="id_quantity" name="quantity" required min="1" step="1" value="1" {% if groupbuy.status != "open" %}disabled{% endif %} />
+                </div>
+                <div class="col-6 col-md-2">
+                    <label for="id_price" class="form-label">Price (£)</label>
+                    <input type="number" class="form-control" id="id_price" name="price" required min="0.01" step="0.01" placeholder="4.50" {% if groupbuy.status != "open" %}disabled{% endif %} />
+                </div>
+                <div class="col-12 col-md-3">
+                    <label for="id_added_by" class="form-label">Added by</label>
+                    <input type="text" class="form-control" id="id_added_by" name="added_by" value="{{ request.user.username }}" readonly />
+                </div>
+                <div class="col-12 d-flex justify-content-end">
+                    <button type="submit" class="btn btn-outline-primary" {% if groupbuy.status != "open" %}disabled{% endif %}>Add item</button>
+                </div>
+            </form>
         </div>
     </div>
 </section>
@@ -24,6 +133,7 @@
             <span class="text-muted small">Live updates as students add their orders</span>
         </div>
         <div class="card-body p-0">
+            {# Participant orders for this group buy (one row per user). #}
             <div class="table-responsive">
                 <table class="table align-middle mb-0">
                     <thead class="table-light">
@@ -59,14 +169,20 @@
                 <h2 class="h5 mb-1">Join this Group Buy</h2>
                 <p class="text-muted mb-0">Enter the quantity you want to order.</p>
             </div>
+            {# Join creates or updates the user's order for this group buy. #}
+            {% if groupbuy.status != "open" %}
+            <div class="alert alert-warning mb-3" role="alert">
+                This group buy is not open for joining right now.
+            </div>
+            {% endif %}
             <form class="row g-3" method="post" action="{% url 'join_groupbuy' groupbuy.id %}">
                 {% csrf_token %}
                 <div class="col-12 col-md-4">
-                    <label for="id_quantity" class="form-label">Quantity</label>
-                    <input type="number" class="form-control" id="id_quantity" name="quantity" required min="1" step="1" value="1" />
+                    <label for="id_join_quantity" class="form-label">Quantity</label>
+                    <input type="number" class="form-control" id="id_join_quantity" name="quantity" required min="1" step="1" value="1" {% if groupbuy.status != "open" %}disabled{% endif %} />
                 </div>
                 <div class="col-12 d-flex pt-2">
-                    <button type="submit" class="btn btn-primary">Join Now</button>
+                    <button type="submit" class="btn btn-primary" {% if groupbuy.status != "open" %}disabled{% endif %}>Join Now</button>
                 </div>
             </form>
         </div>

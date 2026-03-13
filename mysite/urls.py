@@ -1,4 +1,3 @@
-
 from django.contrib import admin
 from django.urls import path
 from . import views
@@ -21,9 +20,17 @@ urlpatterns = [
 
     path('groupbuy/<int:groupbuy_id>/join/', views.join_groupbuy, name="join_groupbuy"),
 
+    path('groupbuy/<int:groupbuy_id>/add-item/', views.add_groupbuy_item, name="add_groupbuy_item"),
+
+    path('groupbuy/<int:groupbuy_id>/items/<int:item_id>/delete/', views.delete_groupbuy_item, name="delete_groupbuy_item"),
+
+    path('groupbuy/<int:groupbuy_id>/status/', views.update_groupbuy_status, name="update_groupbuy_status"),
+
     path('groupbuy/<int:groupbuy_id>/delete/', views.delete_groupbuy, name="delete_groupbuy"),
 
     path('orders/', views.my_orders, name="my_orders"),
+
+    path('orders/<int:order_id>/delete/', views.delete_order, name="delete_order"),
 
     path('profile/', views.profile_view, name="profile"),
 ]

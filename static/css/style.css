@@ -1,3 +1,4 @@
+/* Theme tokens shared across Bootstrap components and custom styles. */
 :root {
     --color-primary: #2c3e50;
     --color-accent: #3498db;
@@ -7,8 +8,10 @@
     --color-text-main: #1f2933;
     --color-text-muted: #6c757d;
     --color-focus-ring: #1d72f3;
+    --app-footer-height: 64px;
 }
 
+/* Minimal reset for predictable sizing. */
 *,
 *::before,
 *::after {
@@ -20,8 +23,10 @@ html {
 }
 
 body {
+    /* Keep content scrollable above the fixed footer (value updated via JS when needed). */
     margin: 0;
     min-height: 100vh;
+    padding-bottom: var(--app-footer-height);
     font-family:
         "Inter",
         -apple-system,
@@ -45,6 +50,7 @@ a:hover {
     text-decoration: underline;
 }
 
+/* Visible focus ring for keyboard navigation (accessibility). */
 a:focus-visible,
 button:focus-visible,
 [role="button"]:focus-visible,
@@ -72,6 +78,7 @@ textarea:focus-visible,
     border-color: #1f2d3a;
 }
 
+/* Ensure minimum touch target size for interactive controls. */
 .btn {
     min-height: 44px;
     min-width: 44px;
@@ -85,6 +92,7 @@ header {
     background-color: var(--color-surface);
 }
 
+/* Nav spacing and typography. */
 .navbar {
     padding-top: 0.6rem;
     padding-bottom: 0.6rem;
@@ -117,9 +125,10 @@ header {
 
 main {
     background-color: var(--color-background);
-    padding-bottom: 4.5rem;
+    padding-bottom: 0;
 }
 
+/* Fixed footer styling (space reserved on body via --app-footer-height). */
 footer {
     border-top: 1px solid var(--color-border-subtle);
     background-color: var(--color-surface);
@@ -133,6 +142,9 @@ footer {
     right: 0;
     bottom: 0;
     z-index: 1040;
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 0;
 }
 
 .app-footer a {
@@ -143,6 +155,7 @@ footer {
     color: #2176c7;
 }
 
+/* Skip link for keyboard users to jump past navigation. */
 .skip-link {
     position: absolute;
     top: 0.5rem;
@@ -174,6 +187,7 @@ footer {
     color: var(--color-text-muted);
 }
 
+/* Card styling used for dashboard and detail sections. */
 .card {
     border-radius: 0.75rem;
     border-color: var(--color-border-subtle);
@@ -239,6 +253,7 @@ footer {
     color: #7b1d1d;
 }
 
+/* Status pills used across dashboard and detail views. */
 .status-badge {
     display: inline-flex;
     align-items: center;
@@ -264,6 +279,7 @@ footer {
     color: #495057;
 }
 
+/* Button press feedback for primary actions. */
 .btn-press {
     transition:
         transform 0.08s ease,
@@ -291,6 +307,7 @@ footer {
     box-shadow: 0 0 0 3px rgba(29, 114, 243, 0.25);
 }
 
+/* Small-screen tweaks for readability. */
 @media (max-width: 576px) {
     .navbar-nav .nav-link {
         padding-top: 0.5rem;

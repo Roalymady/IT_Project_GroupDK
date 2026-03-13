@@ -1,20 +1,27 @@
+{# Load Django's static template tags for CSS/JS/assets. #}
 {% load static %}
 <!doctype html>
 <html lang="en">
     <head>
+        {# Base document metadata for responsive rendering. #}
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        {# Per-page title overridden by child templates. #}
         <title>{% block title %}UniGroupBuy{% endblock %}</title>
+        {# Bootstrap provides responsive layout and UI components. #}
         <link
             rel="stylesheet"
             href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
             integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
             crossorigin="anonymous"
         />
+        {# Project-specific styling layered on top of Bootstrap. #}
         <link rel="stylesheet" href="{% static 'css/style.css' %}" />
     </head>
     <body>
+        {# Accessibility: allow keyboard users to skip directly to main content. #}
         <a class="skip-link" href="#main-content">Skip to content</a>
+        {# Top navigation shared across all pages. #}
         <header>
             <nav
                 class="navbar navbar-expand-lg navbar-light"
@@ -73,19 +80,30 @@
                                 >
                             </li>
                             <li class="nav-item">
-                                <a
-                                    class="nav-link"
-                                    href="{% url 'logout' %}"
-                                    aria-label="Log out of UniGroupBuy"
-                                    >Logout</a
+                                {# Use POST for logout to avoid CSRF-able GET logout patterns. #}
+                                <form
+                                    method="post"
+                                    action="{% url 'logout' %}"
+                                    class="d-inline"
                                 >
+                                    {% csrf_token %}
+                                    <button
+                                        type="submit"
+                                        class="nav-link btn btn-link p-0 border-0"
+                                        aria-label="Log out of UniGroupBuy"
+                                    >
+                                        Logout
+                                    </button>
+                                </form>
                             </li>
                         </ul>
                     </div>
                 </div>
             </nav>
         </header>
+        {# Main page content provided by child templates. #}
         <main id="main-content" class="container py-4">
+            {# Django messages area (auto-dismissed by main.js). #}
             {% if messages %}
             <div class="mb-3" aria-live="polite" aria-atomic="true">
                 {% for message in messages %}
@@ -107,7 +125,8 @@
             </div>
             {% endif %} {% block content %}{% endblock %}
         </main>
-        <footer class="app-footer py-3">
+        {# Fixed footer shared across the site. #}
+        <footer class="app-footer">
             <div
                 class="container d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2"
             >
@@ -118,12 +137,15 @@
                 <span>Built for modern campus group buying.</span>
             </div>
         </footer>
+        {# Bootstrap JS bundle enables navbar toggling and alert dismissal. #}
         <script
             src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
             crossorigin="anonymous"
         ></script>
+        {# Project scripts for interactivity (filters, AJAX, validation, etc.). #}
         <script src="{% static 'js/main.js' %}"></script>
+        {# Optional per-page scripts injected by child templates. #}
         {% block extra_js %}{% endblock %}
     </body>
 </html>
