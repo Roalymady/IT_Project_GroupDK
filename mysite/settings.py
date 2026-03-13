@@ -1,6 +1,17 @@
 import os
 from pathlib import Path
 
+try:
+    import dj_database_url
+except ImportError:
+    dj_database_url = None
+
+try:
+    import whitenoise
+    WHITENOISE_AVAILABLE = True
+except ImportError:
+    WHITENOISE_AVAILABLE = False
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -14,9 +25,9 @@ SECRET_KEY = os.environ.get(
 )
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DJANGO_DEBUG", "1") == "1"
+DEBUG = os.environ.get("DJANGO_DEBUG", "0") == "1"
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost", "testserver"]
+ALLOWED_HOSTS = [".onrender.com", "127.0.0.1", "localhost", "testserver"]
 
 
 # Application definition
@@ -42,6 +53,9 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+if WHITENOISE_AVAILABLE:
+    MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
+
 ROOT_URLCONF = "mysite.urls"
 
 TEMPLATES = [
@@ -64,12 +78,11 @@ WSGI_APPLICATION = "mysite.wsgi.application"
 
 # Database
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
+DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": BASE_DIR / "db.sqlite3"}}
+
+DATABASE_URL = os.environ.get("DATABASE_URL")
+if DATABASE_URL and dj_database_url:
+    DATABASES["default"] = dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=True)
 
 
 # Password validation
@@ -103,8 +116,19 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
-LOGIN_URL = '/login/'
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"
+        if WHITENOISE_AVAILABLE
+        else "django.contrib.staticfiles.storage.StaticFilesStorage"
+    },
+}
+
+LOGIN_URL = "/login/"
